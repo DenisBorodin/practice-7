@@ -7,12 +7,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class LogScript {
     private WebDriver driver;
     private WebDriverWait wait;
+    private int appMenu;
+    private int docs;
+    private String pageName;
 
     @Test
     public void liteCart() {
@@ -26,31 +26,31 @@ public class LogScript {
         driver.findElement(By.name("remember_me")).click();
         driver.findElement(By.name("login")).click();
 
-        ArrayList<String> list = new ArrayList<>();
-        List<WebElement> appMenu = driver.findElements(By.id("box-apps-menu"));
-        List<WebElement> elements = appMenu.get(0).findElements(By.id("app-"));
+       appMenu = driver.findElements(By.cssSelector("ul#box-apps-menu li#app-")).size();
 
-        for (WebElement element : elements) {
-            list.add(element.getText());
-        }
-        for (int i = 0; i < elements.size(); i++) {
-            driver.findElement((By.linkText(list.get(i)))).click();
+         for (int i = 1; i <= appMenu; i++) {
 
-                ArrayList<String> listSecond = new ArrayList<>();
-                List<WebElement> smallElements = driver.findElements(By.xpath("//ul[@class='docs']/li"));
+            WebElement element = refresh(i);
+            pageName = element.findElement(By.xpath(".//span[@class='name']")).getText();
+            element.click();
+            element = refresh(i);
+            docs = element.findElements(By.xpath("./ul[@class='docs']/li[@id]")).size();
 
-                if (smallElements.size() > 0) {
-                    for (WebElement element1 : smallElements) {
-                        listSecond.add(element1.getText());
-                    }
-
-                    for (int x = 0; x < listSecond.size(); x++) {
-                        driver.findElement(By.linkText(listSecond.get(x))).click();
-                    }
+            if (docs > 0) {
+                for (int x = 1; x <= docs; x++) {
+                    element = refresh(i);
+                    WebElement element1 = element.findElement(By.xpath("./ul[@class='docs']/li[@id][" + x + "]"));
+                    pageName = element1.findElement(By.xpath(".//span[@class='name']")).getText();
+                    element1.click();
                 }
+            } else {
             }
-            driver.quit();
-            driver = null;
         }
     }
+    private WebElement refresh(int i) {
+        WebElement element = driver.findElement(By.id("box-apps-menu"));
+        WebElement element1 = element.findElement(By.xpath("./li[@id='app-'][" + i + "]"));
+        return element1;
+    }
+}
 
